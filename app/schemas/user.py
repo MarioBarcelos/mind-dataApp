@@ -13,12 +13,13 @@ class user_create(BaseModel):
 
 # Schema de retorno (nome do schema coincide com o arquivo: user)
 class user(BaseModel):
-    id: int
+    id: str
     nome: str
     username: str
     ativo: bool
     data_criacao: datetime
     observacoes: Optional[str] = None
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }

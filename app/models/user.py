@@ -10,7 +10,7 @@ class user(Base):
     """
     __tablename__ = "user"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String(36), primary_key=True, index=True)
     nome = Column(String(255), nullable=False)
     username = Column(String(150), unique=True, index=True, nullable=False)
     senha = Column(String(255), nullable=False)  # Armazene senha já hasheada

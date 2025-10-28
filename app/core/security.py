@@ -3,23 +3,60 @@ from typing import Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from passlib.context import CryptContext
+import bcrypt
 from .config import get_settings
 from ..schemas.token import CargaToken
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 settings = get_settings()
 
 # OAuth2PasswordBearer para extrair e validar o token JWT
 oauth2_esquema = OAuth2PasswordBearer(tokenUrl="/api/v1/login")
 
 
+def _truncate_password_to_72_bytes(senha: str | bytes) -> bytes:
+    """Encode senha para bytes em UTF-8 e trunca para 72 bytes (limite do bcrypt).
+
+    Retornamos bytes porque o backend bcrypt opera em bytes.
+    """
+    if isinstance(senha, str):
+        b = senha.encode("utf-8")
+    else:
+        b = senha
+    if len(b) > 72:
+        return b[:72]
+    return b
+
+
 def verificar_senha(senha_plana: str, senha_hash: str) -> bool:
-    return pwd_context.verify(senha_plana, senha_hash)
+    """Verifica a senha plana contra o hash. Trunca a senha para 72 bytes antes.
+
+    Se ocorrer um erro de backend (ex.: ValueError por comprimento), retorna False.
+    """
+    try:
+        # Certifica-se que a senha está em bytes e truncada em 72 bytes
+        senha_bytes = senha_plana.encode('utf-8')[:72]
+        hash_bytes = senha_hash.encode('utf-8')
+        
+        return bcrypt.checkpw(senha_bytes, hash_bytes)
+    except Exception as e:
+        print(f"Erro na verificação da senha: {str(e)}")  # Para debug
+        return False
+    
 
 
 def gerar_hash_senha(senha: str) -> str:
-    return pwd_context.hash(senha)
+    """Gera hash para a senha; trunca para 72 bytes antes de hashear (bcrypt).
+
+    Observação: truncamos para manter compatibilidade com a limitação do bcrypt.
+    """
+    try:
+        senha_bytes = senha.encode('utf-8')[:72]
+        salt = bcrypt.gensalt()
+        hash_bytes = bcrypt.hashpw(senha_bytes, salt)
+        return hash_bytes.decode('utf-8')
+    except Exception as e:
+        print(f"Erro ao gerar hash da senha: {str(e)}")  # Para debug
+        raise
 
 
 def criar_token_acesso(data: dict, expires_delta: Optional[timedelta] = None) -> str:

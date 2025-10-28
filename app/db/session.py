@@ -8,7 +8,7 @@ engine = create_engine(settings.DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-def obter_db():
+def  obter_db():
     db = SessionLocal()
     try:
         yield db
