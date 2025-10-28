@@ -3,7 +3,7 @@ version: '3.8'
 services:
   mysql:
     image: mysql:8.0
-    container_name: aclia_mysql
+    container_name: mind_mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -16,11 +16,11 @@ services:
       - mysql_data:/var/lib/mysql
     command: --default-authentication-plugin=mysql_native_password
     networks:
-      - aclia_network
+      - mind_network
 
 volumes:
   mysql_data:
 
 networks:
-  aclia_network:
+  mind_network:
     driver: bridge
