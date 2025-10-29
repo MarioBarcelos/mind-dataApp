@@ -10,7 +10,7 @@ from app.schemas.token import CargaToken
 router = APIRouter()
 
 
-@router.post("/usuarios/", response_model=user_schema)
+@router.post("/usuarios/cadastrar", response_model=user_schema)
 def criar_novo_usuario(usuario: user_create_schema, db: Session = Depends(obter_db)):
     # Validação de unicidade: impede criação de usuário com mesmo username
     existente = obter_usuario_por_username(db, usuario.username)

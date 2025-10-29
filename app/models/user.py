@@ -1,3 +1,4 @@
+import uuid
 from sqlalchemy import Boolean, Column, Integer, String, DateTime, Text, func
 from ..db.base import Base
 
@@ -10,10 +11,10 @@ class user(Base):
     """
     __tablename__ = "user"
 
-    id = Column(String(36), primary_key=True, index=True)
+    id = Column(String(36), primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     nome = Column(String(255), nullable=False)
     username = Column(String(150), unique=True, index=True, nullable=False)
-    senha = Column(String(255), nullable=False)  # Armazene senha já hasheada
+    senha = Column(String(255), nullable=False)  #armazena senha já hasheada
     ativo = Column(Boolean(), default=True, nullable=False)
     data_criacao = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     observacoes = Column(Text, nullable=True)
